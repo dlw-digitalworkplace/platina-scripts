@@ -104,7 +104,7 @@ steps:
       includePreviewVersions: true
 
 - ${{ if ne(parameters.ExternalFeedCredentials, '') }}:
-  - task: NuGetAuthenticate@0
+  - task: NuGetAuthenticate@1
     displayName: 'NuGet Authenticate'
     inputs:
       nuGetServiceConnections: ${{ parameters.ExternalFeedCredentials }}
