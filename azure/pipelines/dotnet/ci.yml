@@ -123,16 +123,21 @@ steps:
       path: $(NUGET_PACKAGES)
     condition: ne(variables.NUGET_PACKAGES, '')
   
-- task: DotNetCoreCLI@2
+- task: PowerShell@2
   displayName: 'DotNet Restore'
-  inputs: 
-    command: 'restore'
-    projects: ${{ parameters.Solution }}
-    ${{ if parameters.NuGetConfigPath }}:
-      feedsToUse: 'config'
-      nugetConfigPath: ${{ parameters.NuGetConfigPath }}
-      externalFeedCredentials: ${{ parameters.ExternalFeedCredentials }}
-      restoreArguments: --locked-mode
+  inputs:
+    targetType: 'inline'
+    script: |
+      $solution = "${{ parameters.Solution }}"
+      $nugetConfig = "${{ parameters.NuGetConfigPath }}"
+      
+      if ($nugetConfig) {
+          Write-Host "Restoring with custom NuGet config..."
+          dotnet restore $solution --configfile $nugetConfig --locked-mode
+      } else {
+          Write-Host "Restoring with default NuGet config..."
+          dotnet restore $solution
+      }
 
 - ${{ if and( ne(parameters.NoTests, true), ne(parameters.WithPlatinaTestInit, false) ) }}:
   - task: PowerShell@2
